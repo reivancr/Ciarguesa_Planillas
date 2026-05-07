@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CIARGUESA — Sistema de Gestión de Planillas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="stylesheet" href="ciarguesa_planillas.css">
+</head>
+
+<body>
+
+  <div id="app">
+    <nav id="sidebar" role="navigation" aria-label="Módulos del sistema">
+      <div class="logo">
+        <div class="logo-name">CIARGUESA</div>
+        <div class="logo-sub">Business Security Solutions</div>
+      </div>
+      <div class="nav-sec">Principal</div>
+      <div class="nav-it on" onclick="go('dashboard',this)" role="button" tabindex="0"><i class="ti ti-layout-dashboard"
+          aria-hidden="true"></i>Dashboard</div>
+      <div class="nav-sec">Operaciones</div>
+      <div class="nav-it" onclick="go('empleados',this)" role="button" tabindex="0"><i class="ti ti-users"
+          aria-hidden="true"></i>Empleados</div>
+      <div class="nav-it" onclick="go('planilla',this)" role="button" tabindex="0"><i class="ti ti-report-money"
+          aria-hidden="true"></i>Planilla Central</div>
+      <div class="nav-sec">Control y Gestión</div>
+      <div class="nav-it" onclick="go('horas',this)" role="button" tabindex="0"><i class="ti ti-clock-pause"
+          aria-hidden="true"></i>Horas Extras</div>
+      <div class="nav-it" onclick="go('vacaciones',this)" role="button" tabindex="0"><i class="ti ti-beach"
+          aria-hidden="true"></i>Vacaciones</div>
+      <div class="nav-it" onclick="go('incapacidades',this)" role="button" tabindex="0"><i class="ti ti-first-aid-kit"
+          aria-hidden="true"></i>Incapacidades</div>
+      <div class="nav-it" onclick="go('boletas',this)" role="button" tabindex="0"><i class="ti ti-file-invoice"
+          aria-hidden="true"></i>Boletas de Pago</div>
+      <!-- <div class="nav-sec">Salidas</div> -->
+      <!-- <div class="nav-it" onclick="go('ccss',this)" role="button" tabindex="0"><i class="ti ti-building-community"
+          aria-hidden="true"></i>Reportes CCSS</div> -->
+      <div class="sb-foot">RH Suite · Administrador<br>© 2026 CIARGUESA</div>
+    </nav>
+
+    <div id="content">
+      <div class="topbar">
+        <h1 id="pg-title">Dashboard</h1>
+        <div class="badges">
+          <span class="pill p-green" id="badge-per">Quincenal</span>
+          <span class="pill p-blue" id="badge-fecha"></span>
+        </div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div class="pg on" id="page-dashboard">
+        <div class="stat-row">
+          <div class="scard">
+            <div class="sl">Total Empleados</div>
+            <div class="sv" id="d-emp">0</div>
+            <div class="sm">en planilla</div>
+          </div>
+          <div class="scard">
+            <div class="sl">Masa Salarial</div>
+            <div class="sv" id="d-masa">₡0</div>
+            <div class="sm">período actual</div>
+          </div>
+          <div class="scard">
+            <div class="sl">H.Extras Pendientes</div>
+            <div class="sv" id="d-hex">0</div>
+            <div class="sm">por aprobar</div>
+          </div>
+          <div class="scard">
+            <div class="sl">Vacaciones activas</div>
+            <div class="sv" id="d-vac">0</div>
+            <div class="sm">en goce</div>
+          </div>
+          <div class="scard">
+            <div class="sl">Incapacidades</div>
+            <div class="sv" id="d-inc">0</div>
+            <div class="sm">este mes</div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-h">
+              <h2>Salarios por empleado</h2>
+            </div>
+            <div class="card-b">
+              <div class="chart-wrap" id="chart-bars"></div>
+              <div id="chart-labs" style="display:flex;gap:5px;margin-top:4px;"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <h2>Cargas sociales 2026</h2><span class="pill p-green">Actualizadas</span>
+            </div>
+            <div class="card-b" style="font-size:12px;">
+              <div class="cr-row"><span style="color:var(--color-text-secondary)">Aporte patronal total
+                  (32.16%)</span><span style="font-weight:500;" id="d-pat">₡0</span></div>
+              <div class="cr-row"><span style="color:var(--color-text-secondary)">Aporte obrero total
+                  (5.50%)</span><span style="font-weight:500;" id="d-ob">₡0</span></div>
+              <div class="divider"></div>
+              <div class="cr-row"><span style="color:var(--color-text-tertiary)">SEM patrono</span><span>9.25%</span>
+              </div>
+              <div class="cr-row"><span style="color:var(--color-text-tertiary)">IVM patrono</span><span>5.08%</span>
+              </div>
+              <div class="cr-row"><span style="color:var(--color-text-tertiary)">FCL patrono</span><span>3.00%</span>
+              </div>
+              <div class="cr-row"><span style="color:var(--color-text-tertiary)">SEM obrero</span><span>5.50%</span>
+              </div>
+              <div class="cr-row"><span style="color:var(--color-text-tertiary)">IVM obrero</span><span>4.33%</span>
+              </div>
+              <div class="cr-row"><span style="color:var(--color-text-tertiary)">Banco Popular
+                  obrero</span><span>1.00%</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h">
+            <h2>Actividad reciente</h2>
+          </div>
+          <div class="card-b" id="d-act" style="display:flex;flex-direction:column;gap:7px;font-size:12.5px;">
+            <div style="color:var(--color-text-tertiary);text-align:center;padding:14px;">Sin actividad.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMPLEADOS -->
+      <div class="pg" id="page-empleados">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <input id="emp-search" placeholder="Buscar empleado..." style="width:200px;" oninput="filtEmp(this.value)">
+          <button class="btn acc" onclick="openM('m-emp')"><i class="ti ti-plus" aria-hidden="true"></i>Nuevo
+            empleado</button>
+        </div>
+        <div class="card">
+          <div class="card-h">
+            <h2>Registro de empleados</h2>
+          </div>
+          <div class="card-b" style="padding:0;">
+            <div style="overflow-x:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cédula</th>
+                    <th>Nombre</th>
+                    <th>Puesto</th>
+                    <th>Salario base</th>
+                    <th>Planilla</th>
+                    <th>Estado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="tb-emp">
+                  <tr>
+                    <td colspan="7" style="text-align:center;color:var(--color-text-tertiary);padding:24px;">Agregue el
+                      primer empleado.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLANILLA -->
+      <div class="pg" id="page-planilla">
+        <div class="grid2">
+          <div class="card">
+            <div class="card-h">
+              <h2>Configurar período</h2>
+            </div>
+            <div class="card-b">
+              <div class="fgrid2">
+                <div class="fg"><label>Tipo de planilla</label><select id="tipo-p" onchange="updBadge()">
+                    <option value="quincenal">Quincenal</option>
+                    <option value="semanal">Semanal</option>
+                  </select></div>
+                <div class="fg"><label>Días del período</label><input type="number" id="p-dias" value="15" min="1"
+                    max="31"></div>
+                <div class="fg"><label>Desde</label><input type="date" id="p-des"></div>
+                <div class="fg"><label>Hasta</label><input type="date" id="p-has"></div>
+              </div>
+              <div style="display:flex;gap:7px;margin-top:4px;">
+                <button class="btn pri" onclick="calcP()"><i class="ti ti-calculator"
+                    aria-hidden="true"></i>Calcular</button>
+                <button class="btn suc" onclick="aprobarP()"><i class="ti ti-check"
+                    aria-hidden="true"></i>Aprobar</button>
+                <button class="btn" onclick="exportP()"><i class="ti ti-download" aria-hidden="true"></i>CSV</button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <h2>Totales del período</h2>
+            </div>
+            <div class="card-b">
+              <div class="grid2" style="gap:10px;margin-bottom:0;">
+                <div class="scard">
+                  <div class="sl">Total bruto</div>
+                  <div style="font-size:18px;font-weight:700;color:var(--primary);" id="p-bruto">₡0</div>
+                </div>
+                <div class="scard">
+                  <div class="sl">Total neto</div>
+                  <div style="font-size:18px;font-weight:700;color:var(--success);" id="p-neto">₡0</div>
+                </div>
+                <div class="scard">
+                  <div class="sl">Cargas patronales</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--warning);" id="p-pat">₡0</div>
+                </div>
+                <div class="scard">
+                  <div class="sl">Deducciones obreras</div>
+                  <div style="font-size:16px;font-weight:700;color:var(--danger);" id="p-ob">₡0</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h">
+            <h2>Detalle de planilla</h2>
+          </div>
+          <div class="card-b" style="padding:0;">
+            <div style="overflow-x:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Cédula</th>
+                    <th>Empleado</th>
+                    <th>Días</th>
+                    <th>Salario bruto</th>
+                    <th>H.Extras</th>
+                    <th>Ded. Ley</th>
+                    <th>Renta</th>
+                    <th>Pensión Alim.</th>
+                    <th>Salario neto</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="tb-p">
+                  <tr>
+                    <td colspan="9" style="text-align:center;color:var(--color-text-tertiary);padding:24px;">Presione
+                      "Calcular" para ver el detalle.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HORAS EXTRAS -->
+      <div class="pg" id="page-horas">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <span style="font-size:12px;color:var(--color-text-secondary);">Horas extras pagadas al 150% — Código de
+            Trabajo Art. 58</span>
+          <button class="btn pri" onclick="openM('m-hex')"><i class="ti ti-plus" aria-hidden="true"></i>Registrar
+            horas</button>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-h">
+              <h2>Calculadora de horas extras</h2>
+            </div>
+            <div class="card-b">
+              <div class="fg"><label>Salario mensual (₡)</label><input type="number" id="c-sal" placeholder="700000"
+                  oninput="calcH()"></div>
+              <div class="fgrid2">
+                <div class="fg"><label>Tipo de jornada</label>
+                  <select id="c-jor" onchange="calcH()">
+                    <option value="diurna">Diurna (8h/día)</option>
+                    <option value="nocturna">Nocturna (6h/día)</option>
+                    <option value="mixta">Mixta (7h/día)</option>
+                  </select>
+                </div>
+                <div class="fg"><label>Horas extras</label><input type="number" id="c-hex" placeholder="8"
+                    oninput="calcH()"></div>
+              </div>
+              <div id="r-hex" class="calc-r">
+                <div class="cr-row"><span style="color:var(--color-text-secondary)">Valor hora ordinaria</span><span
+                    id="rho" style="font-weight:500;"></span></div>
+                <div class="cr-row"><span style="color:var(--color-text-secondary)">Valor hora extra (×1.5)</span><span
+                    id="rhe" style="font-weight:500;color:#BA7517;"></span></div>
+                <div class="divider"></div>
+                <div class="cr-row"><span style="font-weight:500;">Total a pagar</span><span id="rht"
+                    style="font-weight:500;color:#3B6D11;font-size:14px;"></span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <h2>Límites legales</h2>
+            </div>
+            <div class="card-b">
+              <div class="info-b ib-bl"><strong>Jornada diurna</strong> — 05:00–19:00 · Máx. 8h/día ·
+                48h/semana<br>Puede extenderse a 10h si no es peligrosa.</div>
+              <div class="info-b ib-ye"><strong>Jornada nocturna</strong> — 19:00–05:00 · Máx. 6h/día · 36h/semana</div>
+              <div class="info-b ib-gr"><strong>Jornada mixta</strong> — Mezcla día/noche · Máx. 7h/día · 42h/semana
+              </div>
+              <div class="info-b"
+                style="background:var(--color-background-secondary);border-color:var(--color-border-secondary);color:var(--color-text-primary);border-left:2px solid var(--color-border-secondary);">
+                <strong>Hora extra = 150% del salario ordinario</strong><br><span
+                  style="color:var(--color-text-tertiary);font-size:11px;">Const. Art. 58 · Código de Trabajo Art.
+                  136</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h">
+            <h2>Registro de horas extras</h2>
+          </div>
+          <div class="card-b" style="padding:0;">
+            <div style="overflow-x:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Empleado</th>
+                    <th>Jornada</th>
+                    <th>Horas</th>
+                    <th>Monto</th>
+                    <th>Motivo</th>
+                    <th>Estado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="tb-hex">
+                  <tr>
+                    <td colspan="8" style="text-align:center;color:var(--color-text-tertiary);padding:24px;">Sin
+                      registros.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VACACIONES -->
+      <div class="pg" id="page-vacaciones">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <span style="font-size:12px;color:var(--color-text-secondary);">2 semanas por cada 50 semanas trabajadas ·
+            Art. 153 Código de Trabajo</span>
+          <button class="btn pri" onclick="openM('m-vac')"><i class="ti ti-plus" aria-hidden="true"></i>Solicitar
+            vacaciones</button>
+        </div>
+        <div class="grid3">
+          <div class="scard">
+            <div class="sl">En goce de vacaciones</div>
+            <div style="font-size:22px;font-weight:500;color:#3B6D11;" id="v-act">0</div>
+          </div>
+          <div class="scard">
+            <div class="sl">Solicitudes pendientes</div>
+            <div style="font-size:22px;font-weight:500;color:#BA7517;" id="v-pend">0</div>
+          </div>
+          <div class="scard">
+            <div class="sl">Ausencias del mes</div>
+            <div style="font-size:22px;font-weight:500;color:#A32D2D;" id="a-mes">0</div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-h">
+              <h2>Solicitudes de vacaciones</h2>
+            </div>
+            <div class="card-b" style="padding:0;">
+              <div style="overflow-x:auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Empleado</th>
+                      <th>Días acum.</th>
+                      <th>Días sol.</th>
+                      <th>Período</th>
+                      <th>Estado</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody id="tb-vac">
+                    <tr>
+                      <td colspan="6" style="text-align:center;color:var(--color-text-tertiary);padding:18px;">Sin
+                        solicitudes.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <h2>Ausencias</h2><button class="btn sm" onclick="openM('m-aus')"><i class="ti ti-plus"
+                  aria-hidden="true"></i>Registrar</button>
+            </div>
+            <div class="card-b" style="padding:0;">
+              <div style="overflow-x:auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Empleado</th>
+                      <th>Motivo</th>
+                      <th>Justificada</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tb-aus">
+                    <tr>
+                      <td colspan="4" style="text-align:center;color:var(--color-text-tertiary);padding:18px;">Sin
+                        ausencias.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- INCAPACIDADES -->
+      <div class="pg" id="page-incapacidades">
+        <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+          <button class="btn pri" onclick="openM('m-inc')"><i class="ti ti-plus" aria-hidden="true"></i>Nueva
+            incapacidad</button>
+        </div>
+        <div class="grid2">
+          <div class="card">
+            <div class="card-h">
+              <h2>Marco legal CCSS 2026</h2>
+            </div>
+            <div class="card-b">
+              <div class="info-b ib-gr"><strong>Días 1–3:</strong> Patrono paga <strong>50%</strong>. CCSS paga el otro
+                50%.</div>
+              <div class="info-b ib-bl"><strong>Día 4 en adelante:</strong> CCSS paga <strong>60%</strong> del salario.
+                Sin obligación patronal.</div>
+              <div class="info-b ib-ye"><strong>Duración máxima:</strong> 52 semanas continuas (Art. 61 LCCSS).</div>
+              <div class="info-b ib-re"><strong>Prescripción:</strong> 6 meses desde el otorgamiento. Las incapacidades
+                NO suman al aguinaldo (excepción: maternidad).</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <h2>Calculadora de incapacidad</h2>
+            </div>
+            <div class="card-b">
+              <div class="fg"><label>Salario mensual (₡)</label><input type="number" id="ic-sal" placeholder="700000"
+                  oninput="calcIC()"></div>
+              <div class="fgrid2">
+                <div class="fg"><label>Días de incapacidad</label><input type="number" id="ic-dias" placeholder="7"
+                    oninput="calcIC()"></div>
+                <div class="fg"><label>Tipo</label>
+                  <select id="ic-tipo" onchange="calcIC()">
+                    <option value="enfermedad">Enfermedad común</option>
+                    <option value="accidente">Accidente laboral</option>
+                    <option value="maternidad">Maternidad</option>
+                  </select>
+                </div>
+              </div>
+              <div id="r-inc" class="calc-r">
+                <div class="cr-row"><span style="color:var(--color-text-secondary)">Días cargo patrono (1–3)</span><span
+                    id="ic-dp" style="font-weight:500;"></span></div>
+                <div class="cr-row"><span style="color:var(--color-text-secondary)">Monto patrono (50%)</span><span
+                    id="ic-mp" style="font-weight:500;color:#BA7517;"></span></div>
+                <div class="divider"></div>
+                <div class="cr-row"><span style="color:var(--color-text-secondary)">Días cargo CCSS</span><span
+                    id="ic-dc" style="font-weight:500;"></span></div>
+                <div class="cr-row"><span style="color:var(--color-text-secondary)">Monto CCSS (60%)</span><span
+                    id="ic-mc" style="font-weight:500;color:#185FA5;"></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-h">
+            <h2>Registro de incapacidades</h2>
+          </div>
+          <div class="card-b" style="padding:0;">
+            <div style="overflow-x:auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>N° CCSS</th>
+                    <th>Empleado</th>
+                    <th>Inicio</th>
+                    <th>Días</th>
+                    <th>Tipo</th>
+                    <th>Monto patrono</th>
+                    <th>Monto CCSS</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="tb-inc">
+                  <tr>
+                    <td colspan="8" style="text-align:center;color:var(--color-text-tertiary);padding:24px;">Sin
+                      registros.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOLETAS -->
+      <div class="pg" id="page-boletas">
+        <div class="tabs">
+          <div class="tab on" onclick="setTab('boletas', 'ind', this)">Individual</div>
+          <div class="tab" onclick="setTab('boletas', 'mas', this)">Masivo</div>
+          <div class="tab" onclick="setTab('boletas', 'smtp', this)"><i class="ti ti-settings" aria-hidden="true"></i> SMTP</div>
+        </div>
+
+        <!-- INDIVIDUAL -->
+        <div class="tab-pg on" id="boletas-ind">
+          <div class="card">
+            <div class="card-h">
+              <h2>Generar boleta de pago</h2>
+            </div>
+            <div class="card-b">
+              <div class="fg"><label>Empleado</label><select id="bol-emp" onchange="updBolDates()">
+                  <option value="">-- Seleccione --</option>
+                </select></div>
+              <div class="fgrid2">
+                <div class="fg"><label>Tipo de planilla</label>
+                  <select id="bol-tipo" onchange="updBolDates()">
+                    <option value="quincenal">Quincenal</option>
+                    <option value="semanal">Semanal</option>
+                  </select>
+                </div>
+                <div class="fg"><label>Días laborados</label><input type="number" id="bol-dias" value="15"></div>
+                <div class="fg"><label>Desde</label><input type="date" id="bol-des" readonly></div>
+                <div class="fg"><label>Hasta</label><input type="date" id="bol-has" readonly></div>
+                <div class="fg"><label>Horas extras (aprobadas)</label><input type="number" id="bol-hex" placeholder="0" readonly></div>
+                <div class="fg"><label>Otros ingresos (₡)</label><input type="number" id="bol-ot" placeholder="0"></div>
+              </div>
+              <div style="display:flex;gap:7px;margin-top:4px;">
+                <button class="btn pri" onclick="prevBol()"><i class="ti ti-eye" aria-hidden="true"></i>Vista
+                  Previa</button>
+                <button class="btn suc" onclick="printBol()"><i class="ti ti-printer" aria-hidden="true"></i>Imprimir
+                  boleta</button>
+                <button class="btn acc" onclick="sendOneBol()"><i class="ti ti-mail" aria-hidden="true"></i>Enviar por Correo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MASIVO -->
+        <div class="tab-pg" id="boletas-mas">
+          <div class="card">
+            <div class="card-h">
+              <h2>Generación Masiva</h2>
+            </div>
+            <div class="card-b">
+              <div class="fgrid2">
+                <div class="fg"><label>Tipo de planilla</label>
+                  <select id="bol-m-tipo" onchange="updManiDates()">
+                    <option value="quincenal">Quincenal</option>
+                    <option value="semanal">Semanal</option>
+                  </select>
+                </div>
+                <div class="fg"><label>Días del período</label><input type="number" id="bol-m-dias" value="15"></div>
+                <div class="fg"><label>Desde</label><input type="date" id="bol-m-des" readonly></div>
+                <div class="fg"><label>Hasta</label><input type="date" id="bol-m-has" readonly></div>
+              </div>
+              <div style="display:flex;gap:7px;margin-top:10px;">
+                <button class="btn pri" onclick="genMass()"><i class="ti ti-files" aria-hidden="true"></i>Generar todas</button>
+                <button class="btn acc" onclick="sendMass()"><i class="ti ti-mail-forward" aria-hidden="true"></i>Enviar a todos</button>
+              </div>
+            </div>
+          </div>
+          <div class="card" id="bol-m-res" style="display:none;">
+             <div class="card-h"><h2>Previsualización Masiva</h2></div>
+             <div class="card-b" style="padding:0;">
+                <table style="font-size:12px;">
+                   <thead><tr><th>Empleado</th><th>Bruto</th><th>Neto</th><th>Estado Envío</th></tr></thead>
+                   <tbody id="tb-bol-m"></tbody>
+                </table>
+             </div>
+          </div>
+        </div>
+
+        <!-- SMTP -->
+        <div class="tab-pg" id="boletas-smtp">
+          <div class="card">
+            <div class="card-h">
+              <h2>Configuración SMTP</h2>
+            </div>
+            <div class="card-b">
+              <div class="info-b ib-bl" style="margin-bottom:15px;">
+                La configuración se utiliza para el envío automático de boletas a los correos registrados de cada empleado.
+              </div>
+              <div class="fgrid2">
+                <div class="fg"><label>Servidor SMTP (Host)</label><input id="smtp-host" placeholder="smtp.gmail.com"></div>
+                <div class="fg"><label>Puerto</label><input type="number" id="smtp-port" placeholder="465"></div>
+                <div class="fg"><label>Usuario / Correo</label><input id="smtp-user" placeholder="notificaciones@ciarguesa.com"></div>
+                <div class="fg"><label>Contraseña</label><input type="password" id="smtp-pass"></div>
+                <div class="fg"><label>Nombre del remitente</label><input id="smtp-from" value="Recursos Humanos CIARGUESA"></div>
+                <div class="fg"><label>Seguridad</label>
+                  <select id="smtp-sec">
+                    <option value="ssl">SSL / TLS (Recomendado)</option>
+                    <option value="starttls">STARTTLS</option>
+                    <option value="none">Sin cifrar</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:flex;gap:7px;margin-top:14px;">
+                <button class="btn pri" onclick="saveSMTP()"><i class="ti ti-device-floppy" aria-hidden="true"></i>Guardar configuración</button>
+                <button class="btn" onclick="testSMTP()"><i class="ti ti-test-pipe" aria-hidden="true"></i>Probar conexión</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CCSS
+      <div class="pg" id="page-ccss">
+        <div class="grid2">
+          <div class="card">
+            <div class="card-h">
+              <h2>Generar reporte CCSS</h2>
+            </div>
+            <div class="card-b">
+              <div class="fgrid2">
+                <div class="fg"><label>Mes del reporte</label><input type="month" id="cc-mes"></div>
+                <div class="fg"><label>Tipo de planilla</label><select id="cc-tipo">
+                    <option>Mensual</option>
+                    <option>Quincenal</option>
+                    <option>Semanal</option>
+                  </select></div>
+              </div>
+              <div class="fg"><label>N° de patrono CCSS</label><input id="cc-pat" value="2-01-00000000"
+                  placeholder="2-01-12345678"></div>
+              <div style="display:flex;gap:7px;margin-top:4px;">
+                <button class="btn pri" onclick="genCCSS()"><i class="ti ti-file-text" aria-hidden="true"></i>Generar
+                  reporte</button>
+                <button class="btn" onclick="exportCCSS()"><i class="ti ti-download" aria-hidden="true"></i>Exportar
+                  SICERE</button>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-h">
+              <h2>Tasas vigentes 2026</h2><span class="pill p-green">IVM ajustado</span>
+            </div>
+            <div class="card-b" style="font-size:12px;">
+              <div style="display:grid;grid-template-columns:1fr 60px 60px;gap:3px;">
+                <div
+                  style="color:var(--color-text-tertiary);padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+                  Concepto</div>
+                <div
+                  style="color:var(--color-text-tertiary);text-align:right;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+                  Patrono</div>
+                <div
+                  style="color:var(--color-text-tertiary);text-align:right;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+                  Obrero</div>
+                <div style="padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">Enf. y Maternidad
+                  (SEM)</div>
+                <div style="text-align:right;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+                  9.25%</div>
+                <div style="text-align:right;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+                  5.50%</div>
+                <div style="padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">Invalidez, Vejez y
+                  Muerte (IVM)</div>
+                <div style="text-align:right;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+                  5.08%</div>
+                <div style="text-align:right;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+                  4.33%</div>
+                <div style="padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">FCL</div>
+                <div style="text-align:right;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+                  3.00%</div>
+                <div style="text-align:right;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">—
+                </div>
+                <div style="padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">Banco Popular</div>
+                <div style="text-align:right;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+                  0.50%</div>
+                <div style="text-align:right;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+                  1.00%</div>
+                <div style="padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">IMAS + FODESAF + INA
+                  + AF</div>
+                <div style="text-align:right;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">
+                  8.00%</div>
+                <div style="text-align:right;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary);">—
+                </div>
+                <div style="padding:5px 0;font-weight:500;">TOTAL</div>
+                <div style="text-align:right;padding:5px 0;font-weight:500;color:#BA7517;">26.83%</div>
+                <div style="text-align:right;padding:5px 0;font-weight:500;color:#185FA5;">10.83%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="cc-rpt" style="display:none;">
+          <div class="card-h">
+            <h2>Planilla CCSS generada</h2><button class="btn sm" onclick="window.print()"><i class="ti ti-printer"
+                aria-hidden="true"></i>Imprimir</button>
+          </div>
+          <div class="card-b" id="cc-rpt-body" style="padding:0;"></div>
+        </div>
+      </div> -->
+
+    </div>
+  </div>
+
+  <!-- MODALES -->
+  <div class="ov" id="m-emp" role="dialog" aria-modal="true" aria-label="Nuevo empleado">
+    <div class="modal">
+      <div class="m-hdr">
+        <h2><i class="ti ti-user-plus" style="color:var(--accent);margin-right:10px;"></i>Nuevo Empleado</h2><button
+          class="m-close" onclick="closeM('m-emp')" aria-label="Cerrar">&#x2715;</button>
+      </div>
+      <div class="fgrid2">
+        <div class="fg"><label>Cédula *</label><input id="e-ced" placeholder="1-2345-6789"></div>
+        <div class="fg"><label>Nombre completo *</label><input id="e-nom" placeholder="Juan Pérez López"></div>
+        <div class="fg"><label>Puesto *</label><input id="e-pue" placeholder="Oficial de Seguridad"></div>
+        <div class="fg"><label>Departamento</label><input id="e-dep" placeholder="Operaciones"></div>
+        <div class="fg"><label>Salario base mensual (₡) *</label><input type="number" id="e-sal" placeholder="400000">
+        </div>
+        <div class="fg"><label>Tipo de planilla</label><select id="e-tp">
+            <option value="quincenal">Quincenal</option>
+            <option value="semanal">Semanal</option>
+          </select></div>
+        <div class="fg"><label>Tipo de jornada</label><select id="e-jor">
+            <option value="diurna">Diurna</option>
+            <option value="nocturna">Nocturna</option>
+            <option value="mixta">Mixta</option>
+          </select></div>
+        <div class="fg"><label>Fecha de ingreso *</label><input type="date" id="e-ing"></div>
+        <div class="fg"><label>Correo</label><input type="email" id="e-mail" placeholder="empleado@ciarguesa.com"></div>
+        <div class="fg"><label>N° asegurado CCSS</label><input id="e-ase" placeholder="123456789"></div>
+        <div class="fg"><label>Pensión Alimenticia (₡)</label><input type="number" id="e-pres" placeholder="0"></div>
+        <div class="fg"><label>Hijos (para Renta)</label><input type="number" id="e-hijos" value="0" min="0"></div>
+        <div class="fg"><label>¿Tiene Cónyuge? (para Renta)</label>
+          <select id="e-cony">
+            <option value="no">No</option>
+            <option value="si">Sí</option>
+          </select>
+        </div>
+      </div>
+      <div class="m-ft"><button class="btn" onclick="closeM('m-emp')">Cancelar</button><button class="btn pri"
+          onclick="saveEmp()">Guardar empleado</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="m-hex" role="dialog" aria-modal="true" aria-label="Registrar horas extras">
+    <div class="modal">
+      <div class="m-hdr">
+        <h2><i class="ti ti-clock-bolt" style="color:var(--accent);margin-right:10px;"></i>Registrar Horas Extras</h2>
+        <button class="m-close" onclick="closeM('m-hex')" aria-label="Cerrar">&#x2715;</button>
+      </div>
+      <div class="fgrid2">
+        <div class="fg"><label>Empleado *</label><select id="h-emp">
+            <option value="">-- Seleccione --</option>
+          </select></div>
+        <div class="fg"><label>Fecha *</label><input type="date" id="h-fec"></div>
+        <div class="fg"><label>Horas extras *</label><input type="number" id="h-h" placeholder="4" min="0.5" step="0.5">
+        </div>
+        <div class="fg"><label>Tipo de jornada</label><select id="h-jor">
+            <option value="diurna">Diurna</option>
+            <option value="nocturna">Nocturna</option>
+            <option value="mixta">Mixta</option>
+          </select></div>
+        <div class="fg" style="grid-column:1/-1;"><label>Motivo</label><input id="h-mot"
+            placeholder="Cobertura de turno, evento..."></div>
+      </div>
+      <div class="m-ft"><button class="btn" onclick="closeM('m-hex')">Cancelar</button><button class="btn pri"
+          onclick="saveHex()">Registrar</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="m-vac" role="dialog" aria-modal="true" aria-label="Solicitar vacaciones">
+    <div class="modal">
+      <div class="m-hdr">
+        <h2><i class="ti ti-palm-tree" style="color:var(--accent);margin-right:10px;"></i>Solicitud de Vacaciones</h2>
+        <button class="m-close" onclick="closeM('m-vac')" aria-label="Cerrar">&#x2715;</button>
+      </div>
+      <div class="fgrid2">
+        <div class="fg"><label>Empleado *</label><select id="v-emp">
+            <option value="">-- Seleccione --</option>
+          </select></div>
+        <div class="fg"><label>Tipo</label><select id="v-tip">
+            <option>Vacaciones</option>
+            <option>Licencia con goce</option>
+            <option>Licencia sin goce</option>
+          </select></div>
+        <div class="fg"><label>Fecha inicio *</label><input type="date" id="v-ini"></div>
+        <div class="fg"><label>Fecha fin *</label><input type="date" id="v-fin"></div>
+        <div class="fg" style="grid-column:1/-1;"><label>Observaciones</label><input id="v-obs"
+            placeholder="Notas adicionales..."></div>
+      </div>
+      <div class="m-ft"><button class="btn" onclick="closeM('m-vac')">Cancelar</button><button class="btn pri"
+          onclick="saveVac()">Registrar solicitud</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="m-aus" role="dialog" aria-modal="true" aria-label="Registrar ausencia">
+    <div class="modal">
+      <div class="m-hdr">
+        <h2>Registrar ausencia</h2><button class="m-close" onclick="closeM('m-aus')"
+          aria-label="Cerrar">&#x2715;</button>
+      </div>
+      <div class="fgrid2">
+        <div class="fg"><label>Empleado *</label><select id="a-emp">
+            <option value="">-- Seleccione --</option>
+          </select></div>
+        <div class="fg"><label>Fecha *</label><input type="date" id="a-fec"></div>
+        <div class="fg"><label>Motivo</label><select id="a-mot">
+            <option>Cita médica</option>
+            <option>Asunto personal</option>
+            <option>Duelo</option>
+            <option>Otro</option>
+          </select></div>
+        <div class="fg"><label>¿Justificada?</label><select id="a-jus">
+            <option value="si">Sí</option>
+            <option value="no">No</option>
+          </select></div>
+      </div>
+      <div class="m-ft"><button class="btn" onclick="closeM('m-aus')">Cancelar</button><button class="btn pri"
+          onclick="saveAus()">Registrar</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="m-inc" role="dialog" aria-modal="true" aria-label="Registrar incapacidad">
+    <div class="modal">
+      <div class="m-hdr">
+        <h2>Registrar incapacidad</h2><button class="m-close" onclick="closeM('m-inc')"
+          aria-label="Cerrar">&#x2715;</button>
+      </div>
+      <div class="fgrid2">
+        <div class="fg"><label>Empleado *</label><select id="i-emp">
+            <option value="">-- Seleccione --</option>
+          </select></div>
+        <div class="fg"><label>N° registro CCSS</label><input id="i-num" placeholder="123456789"></div>
+        <div class="fg"><label>Fecha inicio *</label><input type="date" id="i-ini"></div>
+        <div class="fg"><label>Días *</label><input type="number" id="i-dias" min="1"></div>
+        <div class="fg"><label>Tipo</label><select id="i-tip">
+            <option value="enfermedad">Enfermedad común</option>
+            <option value="accidente">Accidente laboral</option>
+            <option value="maternidad">Maternidad</option>
+          </select></div>
+        <div class="fg"><label>Diagnóstico</label><input id="i-diag" placeholder="CIE-10 o descripción"></div>
+      </div>
+      <div class="m-ft"><button class="btn" onclick="closeM('m-inc')">Cancelar</button><button class="btn pri"
+          onclick="saveInc()">Registrar</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="m-bol" role="dialog" aria-modal="true" aria-label="Vista previa de boleta">
+    <div class="modal" style="max-width:850px; padding:0; background:transparent; box-shadow:none;">
+      <div style="background:var(--color-background-primary); border-radius:var(--border-radius-lg); overflow:hidden;">
+        <div class="m-hdr" style="border-bottom:1px solid var(--color-border-secondary);">
+          <h2><i class="ti ti-file-invoice" style="color:var(--accent);margin-right:10px;"></i>Vista Previa de Boleta
+          </h2>
+          <button class="m-close" onclick="closeM('m-bol')" aria-label="Cerrar">&#x2715;</button>
+        </div>
+        <div class="card-b" style="background:#f1f5f9; padding:30px; max-height:80vh; overflow-y:auto;">
+          <div id="bol-prev"></div>
+        </div>
+        <div class="m-ft"
+          style="background:var(--color-background-primary); border-top:1px solid var(--color-border-secondary);">
+          <button class="btn" onclick="closeM('m-bol')">Cerrar</button>
+          <button class="btn suc" onclick="printBol()"><i class="ti ti-printer"></i> Imprimir ahora</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"><i class="ti ti-check" aria-hidden="true"></i><span
+      id="toast-msg"></span></div>
+
+  <script src="ciarguesa_planillas.js"></script>
+</body>
+
+</html>
