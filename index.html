@@ -29,6 +29,8 @@
       <div class="nav-it" onclick="go('planilla',this)" role="button" tabindex="0"><i class="ti ti-report-money"
           aria-hidden="true"></i>Planilla Central</div>
       <div class="nav-sec">Control y Gestión</div>
+      <div class="nav-it" onclick="go('marcas',this)" role="button" tabindex="0"><i class="ti ti-fingerprint"
+          aria-hidden="true"></i>Control de Marcas</div>
       <div class="nav-it" onclick="go('horas',this)" role="button" tabindex="0"><i class="ti ti-clock-pause"
           aria-hidden="true"></i>Horas Extras</div>
       <div class="nav-it" onclick="go('vacaciones',this)" role="button" tabindex="0"><i class="ti ti-beach"
@@ -498,119 +500,183 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- BOLETAS -->
-      <div class="pg" id="page-boletas">
-        <div class="tabs">
-          <div class="tab on" onclick="setTab('boletas', 'ind', this)">Individual</div>
-          <div class="tab" onclick="setTab('boletas', 'mas', this)">Masivo</div>
-          <div class="tab" onclick="setTab('boletas', 'smtp', this)"><i class="ti ti-settings" aria-hidden="true"></i> SMTP</div>
-        </div>
-
-        <!-- INDIVIDUAL -->
-        <div class="tab-pg on" id="boletas-ind">
+        <!-- MARCAS -->
+        <div class="pg" id="page-marcas">
           <div class="card">
             <div class="card-h">
-              <h2>Generar boleta de pago</h2>
-            </div>
-            <div class="card-b">
-              <div class="fg"><label>Empleado</label><select id="bol-emp" onchange="updBolDates()">
-                  <option value="">-- Seleccione --</option>
-                </select></div>
-              <div class="fgrid2">
-                <div class="fg"><label>Tipo de planilla</label>
-                  <select id="bol-tipo" onchange="updBolDates()">
-                    <option value="quincenal">Quincenal</option>
-                    <option value="semanal">Semanal</option>
-                  </select>
-                </div>
-                <div class="fg"><label>Días laborados</label><input type="number" id="bol-dias" value="15"></div>
-                <div class="fg"><label>Desde</label><input type="date" id="bol-des" readonly></div>
-                <div class="fg"><label>Hasta</label><input type="date" id="bol-has" readonly></div>
-                <div class="fg"><label>Horas extras (aprobadas)</label><input type="number" id="bol-hex" placeholder="0" readonly></div>
-                <div class="fg"><label>Otros ingresos (₡)</label><input type="number" id="bol-ot" placeholder="0"></div>
+              <h2>Registro General de Marcas</h2>
+              <div style="display:flex;gap:10px;">
+                <button class="btn btn-sm pri" onclick="openM('m-marca-manual')"><i class="ti ti-plus"></i>
+                  Manual</button>
+                <button class="btn btn-sm acc" onclick="document.getElementById('xl-input').click()"><i
+                    class="ti ti-file-spreadsheet"></i> Importar Excel/CSV</button>
+                <input type="file" id="xl-input" style="display:none" onchange="importMarcas(this)">
               </div>
-              <div style="display:flex;gap:7px;margin-top:4px;">
-                <button class="btn pri" onclick="prevBol()"><i class="ti ti-eye" aria-hidden="true"></i>Vista
-                  Previa</button>
-                <button class="btn suc" onclick="printBol()"><i class="ti ti-printer" aria-hidden="true"></i>Imprimir
-                  boleta</button>
-                <button class="btn acc" onclick="sendOneBol()"><i class="ti ti-mail" aria-hidden="true"></i>Enviar por Correo</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- MASIVO -->
-        <div class="tab-pg" id="boletas-mas">
-          <div class="card">
-            <div class="card-h">
-              <h2>Generación Masiva</h2>
-            </div>
-            <div class="card-b">
-              <div class="fgrid2">
-                <div class="fg"><label>Tipo de planilla</label>
-                  <select id="bol-m-tipo" onchange="updManiDates()">
-                    <option value="quincenal">Quincenal</option>
-                    <option value="semanal">Semanal</option>
-                  </select>
-                </div>
-                <div class="fg"><label>Días del período</label><input type="number" id="bol-m-dias" value="15"></div>
-                <div class="fg"><label>Desde</label><input type="date" id="bol-m-des" readonly></div>
-                <div class="fg"><label>Hasta</label><input type="date" id="bol-m-has" readonly></div>
-              </div>
-              <div style="display:flex;gap:7px;margin-top:10px;">
-                <button class="btn pri" onclick="genMass()"><i class="ti ti-files" aria-hidden="true"></i>Generar todas</button>
-                <button class="btn acc" onclick="sendMass()"><i class="ti ti-mail-forward" aria-hidden="true"></i>Enviar a todos</button>
-              </div>
-            </div>
-          </div>
-          <div class="card" id="bol-m-res" style="display:none;">
-             <div class="card-h"><h2>Previsualización Masiva</h2></div>
-             <div class="card-b" style="padding:0;">
-                <table style="font-size:12px;">
-                   <thead><tr><th>Empleado</th><th>Bruto</th><th>Neto</th><th>Estado Envío</th></tr></thead>
-                   <tbody id="tb-bol-m"></tbody>
-                </table>
-             </div>
-          </div>
-        </div>
-
-        <!-- SMTP -->
-        <div class="tab-pg" id="boletas-smtp">
-          <div class="card">
-            <div class="card-h">
-              <h2>Configuración SMTP</h2>
             </div>
             <div class="card-b">
               <div class="info-b ib-bl" style="margin-bottom:15px;">
-                La configuración se utiliza para el envío automático de boletas a los correos registrados de cada empleado.
+                Aquí se consolidan las marcas de entrada y salida. El sistema calcula automáticamente la jornada normal
+                (8h) y las horas extras.
               </div>
-              <div class="fgrid2">
-                <div class="fg"><label>Servidor SMTP (Host)</label><input id="smtp-host" placeholder="smtp.gmail.com"></div>
-                <div class="fg"><label>Puerto</label><input type="number" id="smtp-port" placeholder="465"></div>
-                <div class="fg"><label>Usuario / Correo</label><input id="smtp-user" placeholder="notificaciones@ciarguesa.com"></div>
-                <div class="fg"><label>Contraseña</label><input type="password" id="smtp-pass"></div>
-                <div class="fg"><label>Nombre del remitente</label><input id="smtp-from" value="Recursos Humanos CIARGUESA"></div>
-                <div class="fg"><label>Seguridad</label>
-                  <select id="smtp-sec">
-                    <option value="ssl">SSL / TLS (Recomendado)</option>
-                    <option value="starttls">STARTTLS</option>
-                    <option value="none">Sin cifrar</option>
-                  </select>
-                </div>
+              <div class="fgrid2" style="margin-bottom:20px;">
+                <div class="fg"><label>Filtrar por Empleado</label><select id="f-mar-emp" onchange="renderMarcas()">
+                    <option value="">Todos</option>
+                  </select></div>
+                <div class="fg"><label>Mes</label><input type="month" id="f-mar-mes" onchange="renderMarcas()"></div>
               </div>
-              <div style="display:flex;gap:7px;margin-top:14px;">
-                <button class="btn pri" onclick="saveSMTP()"><i class="ti ti-device-floppy" aria-hidden="true"></i>Guardar configuración</button>
-                <button class="btn" onclick="testSMTP()"><i class="ti ti-test-pipe" aria-hidden="true"></i>Probar conexión</button>
+              <div style="overflow-x:auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Colaborador</th>
+                      <th>Fecha</th>
+                      <th>Entrada</th>
+                      <th>Salida</th>
+                      <th style="text-align:center;">Jornada Normal</th>
+                      <th style="text-align:center;">Horas Extras</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tb-marcas"></tbody>
+                </table>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- CCSS
+        <!-- BOLETAS -->
+        <div class="pg" id="page-boletas">
+          <div class="tabs">
+            <div class="tab on" onclick="setTab('boletas', 'ind', this)">Individual</div>
+            <div class="tab" onclick="setTab('boletas', 'mas', this)">Masivo</div>
+            <div class="tab" onclick="setTab('boletas', 'smtp', this)"><i class="ti ti-settings" aria-hidden="true"></i>
+              SMTP</div>
+          </div>
+
+          <!-- INDIVIDUAL -->
+          <div class="tab-pg on" id="boletas-ind">
+            <div class="card">
+              <div class="card-h">
+                <h2>Generar boleta de pago</h2>
+              </div>
+              <div class="card-b">
+                <div class="fg"><label>Empleado</label><select id="bol-emp" onchange="updBolDates()">
+                    <option value="">-- Seleccione --</option>
+                  </select></div>
+                <div class="fgrid2">
+                  <div class="fg"><label>Tipo de planilla</label>
+                    <select id="bol-tipo" onchange="updBolDates()">
+                      <option value="quincenal">Quincenal</option>
+                      <option value="semanal">Semanal</option>
+                    </select>
+                  </div>
+                  <div class="fg"><label>Días laborados</label><input type="number" id="bol-dias" value="15"></div>
+                  <div class="fg"><label>Desde</label><input type="date" id="bol-des" readonly></div>
+                  <div class="fg"><label>Hasta</label><input type="date" id="bol-has" readonly></div>
+                  <div class="fg"><label>Horas extras (aprobadas)</label><input type="number" id="bol-hex"
+                      placeholder="0" readonly></div>
+                  <div class="fg"><label>Otros ingresos (₡)</label><input type="number" id="bol-ot" placeholder="0">
+                  </div>
+                </div>
+                <div style="display:flex;gap:7px;margin-top:4px;">
+                  <button class="btn pri" onclick="prevBol()"><i class="ti ti-eye" aria-hidden="true"></i>Vista
+                    Previa</button>
+                  <button class="btn suc" onclick="printBol()"><i class="ti ti-printer" aria-hidden="true"></i>Imprimir
+                    boleta</button>
+                  <button class="btn acc" onclick="sendOneBol()"><i class="ti ti-mail" aria-hidden="true"></i>Enviar por
+                    Correo</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- MASIVO -->
+          <div class="tab-pg" id="boletas-mas">
+            <div class="card">
+              <div class="card-h">
+                <h2>Generación Masiva</h2>
+              </div>
+              <div class="card-b">
+                <div class="fgrid2">
+                  <div class="fg"><label>Tipo de planilla</label>
+                    <select id="bol-m-tipo" onchange="updManiDates()">
+                      <option value="quincenal">Quincenal</option>
+                      <option value="semanal">Semanal</option>
+                    </select>
+                  </div>
+                  <div class="fg"><label>Días del período</label><input type="number" id="bol-m-dias" value="15"></div>
+                  <div class="fg"><label>Desde</label><input type="date" id="bol-m-des" readonly></div>
+                  <div class="fg"><label>Hasta</label><input type="date" id="bol-m-has" readonly></div>
+                </div>
+                <div style="display:flex;gap:7px;margin-top:10px;">
+                  <button class="btn pri" onclick="genMass()"><i class="ti ti-files" aria-hidden="true"></i>Generar
+                    todas</button>
+                  <button class="btn acc" onclick="sendMass()"><i class="ti ti-mail-forward"
+                      aria-hidden="true"></i>Enviar a todos</button>
+                </div>
+              </div>
+            </div>
+            <div class="card" id="bol-m-res" style="display:none;">
+              <div class="card-h">
+                <h2>Previsualización Masiva</h2>
+              </div>
+              <div class="card-b" style="padding:0;">
+                <table style="font-size:12px;">
+                  <thead>
+                    <tr>
+                      <th>Empleado</th>
+                      <th>Bruto</th>
+                      <th>Neto</th>
+                      <th>Estado Envío</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tb-bol-m"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- SMTP -->
+          <div class="tab-pg" id="boletas-smtp">
+            <div class="card">
+              <div class="card-h">
+                <h2>Configuración SMTP</h2>
+              </div>
+              <div class="card-b">
+                <div class="info-b ib-bl" style="margin-bottom:15px;">
+                  La configuración se utiliza para el envío automático de boletas a los correos registrados de cada
+                  empleado.
+                </div>
+                <div class="fgrid2">
+                  <div class="fg"><label>Servidor SMTP (Host)</label><input id="smtp-host" placeholder="smtp.gmail.com">
+                  </div>
+                  <div class="fg"><label>Puerto</label><input type="number" id="smtp-port" placeholder="465"></div>
+                  <div class="fg"><label>Usuario / Correo</label><input id="smtp-user"
+                      placeholder="notificaciones@ciarguesa.com"></div>
+                  <div class="fg"><label>Contraseña</label><input type="password" id="smtp-pass"></div>
+                  <div class="fg"><label>Nombre del remitente</label><input id="smtp-from"
+                      value="Recursos Humanos CIARGUESA"></div>
+                  <div class="fg"><label>Seguridad</label>
+                    <select id="smtp-sec">
+                      <option value="ssl">SSL / TLS (Recomendado)</option>
+                      <option value="starttls">STARTTLS</option>
+                      <option value="none">Sin cifrar</option>
+                    </select>
+                  </div>
+                </div>
+                <div style="display:flex;gap:7px;margin-top:14px;">
+                  <button class="btn pri" onclick="saveSMTP()"><i class="ti ti-device-floppy"
+                      aria-hidden="true"></i>Guardar configuración</button>
+                  <button class="btn" onclick="testSMTP()"><i class="ti ti-test-pipe" aria-hidden="true"></i>Probar
+                    conexión</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CCSS
       <div class="pg" id="page-ccss">
         <div class="grid2">
           <div class="card">
@@ -695,176 +761,198 @@
         </div>
       </div> -->
 
-    </div>
-  </div>
-
-  <!-- MODALES -->
-  <div class="ov" id="m-emp" role="dialog" aria-modal="true" aria-label="Nuevo empleado">
-    <div class="modal">
-      <div class="m-hdr">
-        <h2><i class="ti ti-user-plus" style="color:var(--accent);margin-right:10px;"></i>Nuevo Empleado</h2><button
-          class="m-close" onclick="closeM('m-emp')" aria-label="Cerrar">&#x2715;</button>
       </div>
-      <div class="fgrid2">
-        <div class="fg"><label>Cédula *</label><input id="e-ced" placeholder="1-2345-6789"></div>
-        <div class="fg"><label>Nombre completo *</label><input id="e-nom" placeholder="Juan Pérez López"></div>
-        <div class="fg"><label>Puesto *</label><input id="e-pue" placeholder="Oficial de Seguridad"></div>
-        <div class="fg"><label>Departamento</label><input id="e-dep" placeholder="Operaciones"></div>
-        <div class="fg"><label>Salario base mensual (₡) *</label><input type="number" id="e-sal" placeholder="400000">
+    </div>
+
+    <!-- MODALES -->
+    <div class="ov" id="m-emp" role="dialog" aria-modal="true" aria-label="Nuevo empleado">
+      <div class="modal">
+        <div class="m-hdr">
+          <h2><i class="ti ti-user-plus" style="color:var(--accent);margin-right:10px;"></i>Nuevo Empleado</h2><button
+            class="m-close" onclick="closeM('m-emp')" aria-label="Cerrar">&#x2715;</button>
         </div>
-        <div class="fg"><label>Tipo de planilla</label><select id="e-tp">
-            <option value="quincenal">Quincenal</option>
-            <option value="semanal">Semanal</option>
-          </select></div>
-        <div class="fg"><label>Tipo de jornada</label><select id="e-jor">
-            <option value="diurna">Diurna</option>
-            <option value="nocturna">Nocturna</option>
-            <option value="mixta">Mixta</option>
-          </select></div>
-        <div class="fg"><label>Fecha de ingreso *</label><input type="date" id="e-ing"></div>
-        <div class="fg"><label>Correo</label><input type="email" id="e-mail" placeholder="empleado@ciarguesa.com"></div>
-        <div class="fg"><label>N° asegurado CCSS</label><input id="e-ase" placeholder="123456789"></div>
-        <div class="fg"><label>Pensión Alimenticia (₡)</label><input type="number" id="e-pres" placeholder="0"></div>
-        <div class="fg"><label>Hijos (para Renta)</label><input type="number" id="e-hijos" value="0" min="0"></div>
-        <div class="fg"><label>¿Tiene Cónyuge? (para Renta)</label>
-          <select id="e-cony">
-            <option value="no">No</option>
-            <option value="si">Sí</option>
-          </select>
+        <div class="fgrid2">
+          <div class="fg"><label>Cédula *</label><input id="e-ced" placeholder="1-2345-6789"></div>
+          <div class="fg"><label>Nombre completo *</label><input id="e-nom" placeholder="Juan Pérez López"></div>
+          <div class="fg"><label>Puesto *</label><input id="e-pue" placeholder="Oficial de Seguridad"></div>
+          <div class="fg"><label>Departamento</label><input id="e-dep" placeholder="Operaciones"></div>
+          <div class="fg"><label>Salario base mensual (₡) *</label><input type="number" id="e-sal" placeholder="400000">
+          </div>
+          <div class="fg"><label>Tipo de planilla</label><select id="e-tp">
+              <option value="quincenal">Quincenal</option>
+              <option value="semanal">Semanal</option>
+            </select></div>
+          <div class="fg"><label>Tipo de jornada</label><select id="e-jor">
+              <option value="diurna">Diurna</option>
+              <option value="nocturna">Nocturna</option>
+              <option value="mixta">Mixta</option>
+            </select></div>
+          <div class="fg"><label>Fecha de ingreso *</label><input type="date" id="e-ing"></div>
+          <div class="fg"><label>Correo</label><input type="email" id="e-mail" placeholder="empleado@ciarguesa.com">
+          </div>
+          <div class="fg"><label>N° asegurado CCSS</label><input id="e-ase" placeholder="123456789"></div>
+          <div class="fg"><label>Pensión Alimenticia (₡)</label><input type="number" id="e-pres" placeholder="0"></div>
+          <div class="fg"><label>Hijos (para Renta)</label><input type="number" id="e-hijos" value="0" min="0"></div>
+          <div class="fg"><label>¿Tiene Cónyuge? (para Renta)</label>
+            <select id="e-cony">
+              <option value="no">No</option>
+              <option value="si">Sí</option>
+            </select>
+          </div>
+        </div>
+        <div class="m-ft"><button class="btn" onclick="closeM('m-emp')">Cancelar</button><button class="btn pri"
+            onclick="saveEmp()">Guardar empleado</button></div>
+      </div>
+    </div>
+
+    <div class="ov" id="m-hex" role="dialog" aria-modal="true" aria-label="Registrar horas extras">
+      <div class="modal">
+        <div class="m-hdr">
+          <h2><i class="ti ti-clock-bolt" style="color:var(--accent);margin-right:10px;"></i>Registrar Horas Extras</h2>
+          <button class="m-close" onclick="closeM('m-hex')" aria-label="Cerrar">&#x2715;</button>
+        </div>
+        <div class="fgrid2">
+          <div class="fg"><label>Empleado *</label><select id="h-emp">
+              <option value="">-- Seleccione --</option>
+            </select></div>
+          <div class="fg"><label>Fecha *</label><input type="date" id="h-fec"></div>
+          <div class="fg"><label>Horas extras *</label><input type="number" id="h-h" placeholder="4" min="0.5"
+              step="0.5">
+          </div>
+          <div class="fg"><label>Tipo de jornada</label><select id="h-jor">
+              <option value="diurna">Diurna</option>
+              <option value="nocturna">Nocturna</option>
+              <option value="mixta">Mixta</option>
+            </select></div>
+          <div class="fg" style="grid-column:1/-1;"><label>Motivo</label><input id="h-mot"
+              placeholder="Cobertura de turno, evento..."></div>
+        </div>
+        <div class="m-ft"><button class="btn" onclick="closeM('m-hex')">Cancelar</button><button class="btn pri"
+            onclick="saveHex()">Registrar</button></div>
+      </div>
+    </div>
+
+    <div class="ov" id="m-vac" role="dialog" aria-modal="true" aria-label="Solicitar vacaciones">
+      <div class="modal">
+        <div class="m-hdr">
+          <h2><i class="ti ti-palm-tree" style="color:var(--accent);margin-right:10px;"></i>Solicitud de Vacaciones</h2>
+          <button class="m-close" onclick="closeM('m-vac')" aria-label="Cerrar">&#x2715;</button>
+        </div>
+        <div class="fgrid2">
+          <div class="fg"><label>Empleado *</label><select id="v-emp">
+              <option value="">-- Seleccione --</option>
+            </select></div>
+          <div class="fg"><label>Tipo</label><select id="v-tip">
+              <option>Vacaciones</option>
+              <option>Licencia con goce</option>
+              <option>Licencia sin goce</option>
+            </select></div>
+          <div class="fg"><label>Fecha inicio *</label><input type="date" id="v-ini"></div>
+          <div class="fg"><label>Fecha fin *</label><input type="date" id="v-fin"></div>
+          <div class="fg" style="grid-column:1/-1;"><label>Observaciones</label><input id="v-obs"
+              placeholder="Notas adicionales..."></div>
+        </div>
+        <div class="m-ft"><button class="btn" onclick="closeM('m-vac')">Cancelar</button><button class="btn pri"
+            onclick="saveVac()">Registrar solicitud</button></div>
+      </div>
+    </div>
+
+    <div class="ov" id="m-aus" role="dialog" aria-modal="true" aria-label="Registrar ausencia">
+      <div class="modal">
+        <div class="m-hdr">
+          <h2>Registrar ausencia</h2><button class="m-close" onclick="closeM('m-aus')"
+            aria-label="Cerrar">&#x2715;</button>
+        </div>
+        <div class="fgrid2">
+          <div class="fg"><label>Empleado *</label><select id="a-emp">
+              <option value="">-- Seleccione --</option>
+            </select></div>
+          <div class="fg"><label>Fecha *</label><input type="date" id="a-fec"></div>
+          <div class="fg"><label>Motivo</label><select id="a-mot">
+              <option>Cita médica</option>
+              <option>Asunto personal</option>
+              <option>Duelo</option>
+              <option>Otro</option>
+            </select></div>
+          <div class="fg"><label>¿Justificada?</label><select id="a-jus">
+              <option value="si">Sí</option>
+              <option value="no">No</option>
+            </select></div>
+        </div>
+        <div class="m-ft"><button class="btn" onclick="closeM('m-aus')">Cancelar</button><button class="btn pri"
+            onclick="saveAus()">Registrar</button></div>
+      </div>
+    </div>
+
+    <div class="ov" id="m-inc" role="dialog" aria-modal="true" aria-label="Registrar incapacidad">
+      <div class="modal">
+        <div class="m-hdr">
+          <h2>Registrar incapacidad</h2><button class="m-close" onclick="closeM('m-inc')"
+            aria-label="Cerrar">&#x2715;</button>
+        </div>
+        <div class="fgrid2">
+          <div class="fg"><label>Empleado *</label><select id="i-emp">
+              <option value="">-- Seleccione --</option>
+            </select></div>
+          <div class="fg"><label>N° registro CCSS</label><input id="i-num" placeholder="123456789"></div>
+          <div class="fg"><label>Fecha inicio *</label><input type="date" id="i-ini"></div>
+          <div class="fg"><label>Días *</label><input type="number" id="i-dias" min="1"></div>
+          <div class="fg"><label>Tipo</label><select id="i-tip">
+              <option value="enfermedad">Enfermedad común</option>
+              <option value="accidente">Accidente laboral</option>
+              <option value="maternidad">Maternidad</option>
+            </select></div>
+          <div class="fg"><label>Diagnóstico</label><input id="i-diag" placeholder="CIE-10 o descripción"></div>
+        </div>
+        <div class="m-ft"><button class="btn" onclick="closeM('m-inc')">Cancelar</button><button class="btn pri"
+            onclick="saveInc()">Registrar</button></div>
+      </div>
+    </div>
+
+    <div class="ov" id="m-marca-manual" role="dialog" aria-modal="true" aria-label="Registro de marca manual">
+      <div class="modal">
+        <div class="m-hdr">
+          <h2>Registro de marca manual</h2><button class="m-close" onclick="closeM('m-marca-manual')"
+            aria-label="Cerrar">&#x2715;</button>
+        </div>
+        <div class="fgrid2">
+          <div class="fg"><label>Empleado *</label><select id="mar-emp">
+              <option value="">-- Seleccione --</option>
+            </select></div>
+          <div class="fg"><label>Fecha *</label><input type="date" id="mar-fec"></div>
+          <div class="fg"><label>Hora Entrada *</label><input type="time" id="mar-ent"></div>
+          <div class="fg"><label>Hora Salida *</label><input type="time" id="mar-sal"></div>
+        </div>
+        <div class="m-ft"><button class="btn" onclick="closeM('m-marca-manual')">Cancelar</button><button
+            class="btn pri" onclick="saveMarca()">Registrar Marca</button></div>
+      </div>
+    </div>
+
+    <div class="ov" id="m-bol" role="dialog" aria-modal="true" aria-label="Vista previa de boleta">
+      <div class="modal" style="max-width:850px; padding:0; background:transparent; box-shadow:none;">
+        <div
+          style="background:var(--color-background-primary); border-radius:var(--border-radius-lg); overflow:hidden;">
+          <div class="m-hdr" style="border-bottom:1px solid var(--color-border-secondary);">
+            <h2><i class="ti ti-file-invoice" style="color:var(--accent);margin-right:10px;"></i>Vista Previa de Boleta
+            </h2>
+            <button class="m-close" onclick="closeM('m-bol')" aria-label="Cerrar">&#x2715;</button>
+          </div>
+          <div class="card-b" style="background:#f1f5f9; padding:30px; max-height:80vh; overflow-y:auto;">
+            <div id="bol-prev"></div>
+          </div>
+          <div class="m-ft"
+            style="background:var(--color-background-primary); border-top:1px solid var(--color-border-secondary);">
+            <button class="btn" onclick="closeM('m-bol')">Cerrar</button>
+            <button class="btn suc" onclick="printBol()"><i class="ti ti-printer"></i> Imprimir ahora</button>
+          </div>
         </div>
       </div>
-      <div class="m-ft"><button class="btn" onclick="closeM('m-emp')">Cancelar</button><button class="btn pri"
-          onclick="saveEmp()">Guardar empleado</button></div>
     </div>
-  </div>
 
-  <div class="ov" id="m-hex" role="dialog" aria-modal="true" aria-label="Registrar horas extras">
-    <div class="modal">
-      <div class="m-hdr">
-        <h2><i class="ti ti-clock-bolt" style="color:var(--accent);margin-right:10px;"></i>Registrar Horas Extras</h2>
-        <button class="m-close" onclick="closeM('m-hex')" aria-label="Cerrar">&#x2715;</button>
-      </div>
-      <div class="fgrid2">
-        <div class="fg"><label>Empleado *</label><select id="h-emp">
-            <option value="">-- Seleccione --</option>
-          </select></div>
-        <div class="fg"><label>Fecha *</label><input type="date" id="h-fec"></div>
-        <div class="fg"><label>Horas extras *</label><input type="number" id="h-h" placeholder="4" min="0.5" step="0.5">
-        </div>
-        <div class="fg"><label>Tipo de jornada</label><select id="h-jor">
-            <option value="diurna">Diurna</option>
-            <option value="nocturna">Nocturna</option>
-            <option value="mixta">Mixta</option>
-          </select></div>
-        <div class="fg" style="grid-column:1/-1;"><label>Motivo</label><input id="h-mot"
-            placeholder="Cobertura de turno, evento..."></div>
-      </div>
-      <div class="m-ft"><button class="btn" onclick="closeM('m-hex')">Cancelar</button><button class="btn pri"
-          onclick="saveHex()">Registrar</button></div>
-    </div>
-  </div>
+    <div id="toast" role="status" aria-live="polite"><i class="ti ti-check" aria-hidden="true"></i><span
+        id="toast-msg"></span></div>
 
-  <div class="ov" id="m-vac" role="dialog" aria-modal="true" aria-label="Solicitar vacaciones">
-    <div class="modal">
-      <div class="m-hdr">
-        <h2><i class="ti ti-palm-tree" style="color:var(--accent);margin-right:10px;"></i>Solicitud de Vacaciones</h2>
-        <button class="m-close" onclick="closeM('m-vac')" aria-label="Cerrar">&#x2715;</button>
-      </div>
-      <div class="fgrid2">
-        <div class="fg"><label>Empleado *</label><select id="v-emp">
-            <option value="">-- Seleccione --</option>
-          </select></div>
-        <div class="fg"><label>Tipo</label><select id="v-tip">
-            <option>Vacaciones</option>
-            <option>Licencia con goce</option>
-            <option>Licencia sin goce</option>
-          </select></div>
-        <div class="fg"><label>Fecha inicio *</label><input type="date" id="v-ini"></div>
-        <div class="fg"><label>Fecha fin *</label><input type="date" id="v-fin"></div>
-        <div class="fg" style="grid-column:1/-1;"><label>Observaciones</label><input id="v-obs"
-            placeholder="Notas adicionales..."></div>
-      </div>
-      <div class="m-ft"><button class="btn" onclick="closeM('m-vac')">Cancelar</button><button class="btn pri"
-          onclick="saveVac()">Registrar solicitud</button></div>
-    </div>
-  </div>
-
-  <div class="ov" id="m-aus" role="dialog" aria-modal="true" aria-label="Registrar ausencia">
-    <div class="modal">
-      <div class="m-hdr">
-        <h2>Registrar ausencia</h2><button class="m-close" onclick="closeM('m-aus')"
-          aria-label="Cerrar">&#x2715;</button>
-      </div>
-      <div class="fgrid2">
-        <div class="fg"><label>Empleado *</label><select id="a-emp">
-            <option value="">-- Seleccione --</option>
-          </select></div>
-        <div class="fg"><label>Fecha *</label><input type="date" id="a-fec"></div>
-        <div class="fg"><label>Motivo</label><select id="a-mot">
-            <option>Cita médica</option>
-            <option>Asunto personal</option>
-            <option>Duelo</option>
-            <option>Otro</option>
-          </select></div>
-        <div class="fg"><label>¿Justificada?</label><select id="a-jus">
-            <option value="si">Sí</option>
-            <option value="no">No</option>
-          </select></div>
-      </div>
-      <div class="m-ft"><button class="btn" onclick="closeM('m-aus')">Cancelar</button><button class="btn pri"
-          onclick="saveAus()">Registrar</button></div>
-    </div>
-  </div>
-
-  <div class="ov" id="m-inc" role="dialog" aria-modal="true" aria-label="Registrar incapacidad">
-    <div class="modal">
-      <div class="m-hdr">
-        <h2>Registrar incapacidad</h2><button class="m-close" onclick="closeM('m-inc')"
-          aria-label="Cerrar">&#x2715;</button>
-      </div>
-      <div class="fgrid2">
-        <div class="fg"><label>Empleado *</label><select id="i-emp">
-            <option value="">-- Seleccione --</option>
-          </select></div>
-        <div class="fg"><label>N° registro CCSS</label><input id="i-num" placeholder="123456789"></div>
-        <div class="fg"><label>Fecha inicio *</label><input type="date" id="i-ini"></div>
-        <div class="fg"><label>Días *</label><input type="number" id="i-dias" min="1"></div>
-        <div class="fg"><label>Tipo</label><select id="i-tip">
-            <option value="enfermedad">Enfermedad común</option>
-            <option value="accidente">Accidente laboral</option>
-            <option value="maternidad">Maternidad</option>
-          </select></div>
-        <div class="fg"><label>Diagnóstico</label><input id="i-diag" placeholder="CIE-10 o descripción"></div>
-      </div>
-      <div class="m-ft"><button class="btn" onclick="closeM('m-inc')">Cancelar</button><button class="btn pri"
-          onclick="saveInc()">Registrar</button></div>
-    </div>
-  </div>
-
-  <div class="ov" id="m-bol" role="dialog" aria-modal="true" aria-label="Vista previa de boleta">
-    <div class="modal" style="max-width:850px; padding:0; background:transparent; box-shadow:none;">
-      <div style="background:var(--color-background-primary); border-radius:var(--border-radius-lg); overflow:hidden;">
-        <div class="m-hdr" style="border-bottom:1px solid var(--color-border-secondary);">
-          <h2><i class="ti ti-file-invoice" style="color:var(--accent);margin-right:10px;"></i>Vista Previa de Boleta
-          </h2>
-          <button class="m-close" onclick="closeM('m-bol')" aria-label="Cerrar">&#x2715;</button>
-        </div>
-        <div class="card-b" style="background:#f1f5f9; padding:30px; max-height:80vh; overflow-y:auto;">
-          <div id="bol-prev"></div>
-        </div>
-        <div class="m-ft"
-          style="background:var(--color-background-primary); border-top:1px solid var(--color-border-secondary);">
-          <button class="btn" onclick="closeM('m-bol')">Cerrar</button>
-          <button class="btn suc" onclick="printBol()"><i class="ti ti-printer"></i> Imprimir ahora</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="toast" role="status" aria-live="polite"><i class="ti ti-check" aria-hidden="true"></i><span
-      id="toast-msg"></span></div>
-
-  <script src="ciarguesa_planillas.js"></script>
+    <script src="ciarguesa_planillas.js"></script>
 </body>
 
 </html>

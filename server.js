@@ -108,25 +108,25 @@ if (!adminExists) {
 app.locals.db = db;
 
 // ─── Rutas ────────────────────────────────────────────────────
-app.use('/api/auth',        require('./routes/auth'));
-app.use('/api/users',       require('./routes/users'));
-app.use('/api/clients',     require('./routes/clients'));
-app.use('/api/invoices',    require('./routes/invoices'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/clients', require('./routes/clients'));
+app.use('/api/invoices', require('./routes/invoices'));
 app.use('/api/work-orders', require('./routes/work_orders'));
-app.use('/api/mail',        require('./routes/mail'));
+app.use('/api/mail', require('./routes/mail'));
 
 // ─── Dashboard stats ───────────────────────────────────────────
 const { verifyToken } = require('./middleware/auth');
 app.get('/api/dashboard', verifyToken, (req, res) => {
   const stats = {
-    totalClients:    db.prepare("SELECT COUNT(*) AS c FROM clients WHERE active=1").get().c,
-    totalInvoices:   db.prepare("SELECT COUNT(*) AS c FROM invoices").get().c,
+    totalClients: db.prepare("SELECT COUNT(*) AS c FROM clients WHERE active=1").get().c,
+    totalInvoices: db.prepare("SELECT COUNT(*) AS c FROM invoices").get().c,
     pendingInvoices: db.prepare("SELECT COUNT(*) AS c FROM invoices WHERE status='pendiente'").get().c,
-    revenueMonth:    db.prepare(`SELECT COALESCE(SUM(total),0) AS s FROM invoices WHERE status='pagada' AND strftime('%Y-%m',created_at)=strftime('%Y-%m','now')`).get().s,
-    openOrders:      db.prepare("SELECT COUNT(*) AS c FROM work_orders WHERE status NOT IN ('completado','cancelado')").get().c,
-    usersActive:     db.prepare("SELECT COUNT(*) AS c FROM users WHERE active=1").get().c,
-    recentInvoices:  db.prepare(`SELECT i.id, i.number, c.name AS client, i.total, i.status, i.created_at FROM invoices i JOIN clients c ON i.client_id=c.id ORDER BY i.created_at DESC LIMIT 5`).all(),
-    recentOrders:    db.prepare(`SELECT wo.id, wo.title, wo.status, wo.priority, u.name AS assigned FROM work_orders wo LEFT JOIN users u ON wo.assigned_to=u.id ORDER BY wo.created_at DESC LIMIT 5`).all(),
+    revenueMonth: db.prepare(`SELECT COALESCE(SUM(total),0) AS s FROM invoices WHERE status='pagada' AND strftime('%Y-%m',created_at)=strftime('%Y-%m','now')`).get().s,
+    openOrders: db.prepare("SELECT COUNT(*) AS c FROM work_orders WHERE status NOT IN ('completado','cancelado')").get().c,
+    usersActive: db.prepare("SELECT COUNT(*) AS c FROM users WHERE active=1").get().c,
+    recentInvoices: db.prepare(`SELECT i.id, i.number, c.name AS client, i.total, i.status, i.created_at FROM invoices i JOIN clients c ON i.client_id=c.id ORDER BY i.created_at DESC LIMIT 5`).all(),
+    recentOrders: db.prepare(`SELECT wo.id, wo.title, wo.status, wo.priority, u.name AS assigned FROM work_orders wo LEFT JOIN users u ON wo.assigned_to=u.id ORDER BY wo.created_at DESC LIMIT 5`).all(),
   };
   res.json(stats);
 });

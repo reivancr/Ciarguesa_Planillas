@@ -1,13 +1,14 @@
 const TP = 0.3216, TO = 0.055;
-let emps = JSON.parse(localStorage.getItem('cg_e') || '[]');
-let hexs = JSON.parse(localStorage.getItem('cg_h') || '[]');
-let vacs = JSON.parse(localStorage.getItem('cg_v') || '[]');
-let auss = JSON.parse(localStorage.getItem('cg_a') || '[]');
-let incs = JSON.parse(localStorage.getItem('cg_i') || '[]');
-let acts = JSON.parse(localStorage.getItem('cg_ac') || '[]');
-const sv = () => { ['cg_e', 'cg_h', 'cg_v', 'cg_a', 'cg_i', 'cg_ac'].forEach((k, i) => localStorage.setItem(k, JSON.stringify([emps, hexs, vacs, auss, incs, acts][i]))); };
+let emps = JSON.parse(localStorage.getItem('cg_emps') || '[]');
+let hexs = JSON.parse(localStorage.getItem('cg_hexs') || '[]');
+let vacs = JSON.parse(localStorage.getItem('cg_vacs') || '[]');
+let auss = JSON.parse(localStorage.getItem('cg_auss') || '[]');
+let incs = JSON.parse(localStorage.getItem('cg_incs') || '[]');
+let marcas = JSON.parse(localStorage.getItem('cg_marcas') || '[]');
+let acts = JSON.parse(localStorage.getItem('cg_acts') || '[]');
+const sv = () => { ['cg_emps', 'cg_hexs', 'cg_vacs', 'cg_auss', 'cg_incs', 'cg_marcas', 'cg_acts'].forEach((k, i) => localStorage.setItem(k, JSON.stringify([emps, hexs, vacs, auss, incs, marcas, acts][i]))); };
 const fmt = n => '₡' + parseFloat(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-const titles = { dashboard: 'Dashboard Principal', empleados: 'Gestión de Empleados', planilla: 'Planilla Central', horas: 'Control de Horas Extras', vacaciones: 'Gestión de Vacaciones', incapacidades: 'Registro de Incapacidades', boletas: 'Emisión de Boletas', ccss: 'Reportes CCSS / SICERE' };
+const titles = { dashboard: 'Dashboard', empleados: 'Colaboradores', planilla: 'Planilla Central', marcas: 'Control de Marcas', horas: 'Horas Extras', vacaciones: 'Gestión de Vacaciones', incapacidades: 'Incapacidades', boletas: 'Boletas de Pago' };
 const cols = ['#1E293B', '#C29947', '#334155', '#D4B475', '#475569', '#AF8735', '#64748B'];
 
 document.getElementById('badge-fecha').textContent = new Date().toLocaleDateString('es-CR', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -20,6 +21,7 @@ function go(id, el) {
   document.getElementById('pg-title').textContent = titles[id] || id;
   if (id === 'dashboard') updDash();
   if (id === 'planilla') initP();
+  if (id === 'marcas') { syncSels(); initMarcas(); }
   if (id === 'boletas') { syncSels(); initBol(); loadSMTP(); }
   // if (id === 'ccss') initCC();
 }
@@ -47,10 +49,10 @@ function closeM(id) { document.getElementById(id).classList.remove('on'); }
 document.querySelectorAll('.ov').forEach(o => o.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('on'); }));
 
 function syncSels() {
-  ['h-emp', 'v-emp', 'a-emp', 'i-emp', 'bol-emp'].forEach(id => {
+  ['h-emp', 'v-emp', 'a-emp', 'i-emp', 'bol-emp', 'mar-emp', 'f-mar-emp'].forEach(id => {
     const el = document.getElementById(id); if (!el) return;
     const cur = el.value;
-    el.innerHTML = '<option value="">-- Seleccione --</option>';
+    el.innerHTML = id === 'f-mar-emp' ? '<option value="">Todos</option>' : '<option value="">-- Seleccione --</option>';
     emps.forEach(e => { const o = document.createElement('option'); o.value = e.ced; o.textContent = e.nom + ' (' + e.ced + ')'; el.appendChild(o); });
     el.value = cur;
   });
@@ -102,17 +104,17 @@ function saveEmp() {
   const sal = parseFloat(document.getElementById('e-sal').value);
   if (!ced || !nom || !sal) { toast('Complete los campos obligatorios', 'err'); return; }
   if (emps.find(e => e.ced === ced)) { toast('Ya existe esa cédula', 'err'); return; }
-  emps.push({ 
-    ced, nom, sal, 
-    pue: document.getElementById('e-pue').value.trim(), 
-    dep: document.getElementById('e-dep').value.trim(), 
-    tp: document.getElementById('e-tp').value, 
-    jor: document.getElementById('e-jor').value, 
-    ing: document.getElementById('e-ing').value, 
-    mail: document.getElementById('e-mail').value, 
-    ase: document.getElementById('e-ase').value, 
-    pres: parseFloat(document.getElementById('e-pres').value || 0), 
-    hijos: parseInt(document.getElementById('e-hijos').value || 0), 
+  emps.push({
+    ced, nom, sal,
+    pue: document.getElementById('e-pue').value.trim(),
+    dep: document.getElementById('e-dep').value.trim(),
+    tp: document.getElementById('e-tp').value,
+    jor: document.getElementById('e-jor').value,
+    ing: document.getElementById('e-ing').value,
+    mail: document.getElementById('e-mail').value,
+    ase: document.getElementById('e-ase').value,
+    pres: parseFloat(document.getElementById('e-pres').value || 0),
+    hijos: parseInt(document.getElementById('e-hijos').value || 0),
     cony: document.getElementById('e-cony').value,
     acumBruto: 0 // Para cálculo de Aguinaldo
   });
@@ -209,23 +211,23 @@ function calcP() {
   </tr>`).join('');
 }
 
-function aprobarP() { 
+function aprobarP() {
   const tipo = document.getElementById('tipo-p').value;
   const dias = parseInt(document.getElementById('p-dias').value) || (tipo === 'quincenal' ? 15 : 7);
-  
+
   // Actualizar acumulados de Aguinaldo para los empleados en esta planilla
   emps.forEach(e => {
     if (e.tp === tipo) {
       const sm = parseFloat(e.sal), sp = (sm / 30) * dias;
-      const mh = hexs.filter(h => h.emp === e.ced && h.est !== 'rechazado').reduce((s, h) => { 
-        return s + (sm / (30 * 8)) * 1.5 * parseFloat(h.h || 0); 
+      const mh = hexs.filter(h => h.emp === e.ced && h.est !== 'rechazado').reduce((s, h) => {
+        return s + (sm / (30 * 8)) * 1.5 * parseFloat(h.h || 0);
       }, 0);
       const br = sp + mh;
       e.acumBruto = (e.acumBruto || 0) + br;
     }
   });
-  
-  sv(); calcP(); toast('Planilla aprobada y acumulados actualizados'); log('Planilla aprobada: ' + tipo); 
+
+  sv(); calcP(); toast('Planilla aprobada y acumulados actualizados'); log('Planilla aprobada: ' + tipo);
 }
 
 function exportP() {
@@ -395,7 +397,7 @@ function updBolDates() {
   // Calcular horas extras automáticas para este periodo
   if (ced) {
     const hexTotal = hexs.filter(h => h.emp === ced && h.est === 'aprobado' && h.fec >= des.toISOString().split('T')[0] && h.fec <= has.toISOString().split('T')[0])
-                         .reduce((s, h) => s + parseFloat(h.h || 0), 0);
+      .reduce((s, h) => s + parseFloat(h.h || 0), 0);
     document.getElementById('bol-hex').value = hexTotal;
   }
 }
@@ -428,12 +430,12 @@ function updManiDates() {
 function qBol(ced) {
   const e = emps.find(x => x.ced === ced);
   go('boletas', document.querySelectorAll('.nav-it')[6]); // El índice cambió al moverlo
-  setTimeout(() => { 
-    syncSels(); 
-    document.getElementById('bol-emp').value = ced; 
+  setTimeout(() => {
+    syncSels();
+    document.getElementById('bol-emp').value = ced;
     if (e) document.getElementById('bol-tipo').value = e.tp;
-    updBolDates(); 
-    prevBol(); 
+    updBolDates();
+    prevBol();
   }, 80);
 }
 
@@ -590,7 +592,7 @@ async function sendOneBol() {
   const ced = document.getElementById('bol-emp').value;
   const e = emps.find(x => x.ced === ced);
   if (!e || !e.mail) { toast('El empleado no tiene correo registrado', 'err'); return; }
-  
+
   const smtp = JSON.parse(localStorage.getItem('cg_smtp') || '{}');
   if (!smtp.host) { toast('Configure el SMTP primero', 'err'); return; }
 
@@ -620,9 +622,9 @@ function genMass() {
   const des = document.getElementById('bol-m-des').value, has = document.getElementById('bol-m-has').value;
   const dias = parseInt(document.getElementById('bol-m-dias').value) || 15;
   const filtered = emps.filter(e => e.tp === tipo);
-  
+
   if (!filtered.length) { toast('No hay empleados de tipo ' + tipo, 'err'); return; }
-  
+
   const tb = document.getElementById('tb-bol-m');
   tb.innerHTML = filtered.map(e => {
     const sm = parseFloat(e.sal), sp = (sm / 30) * dias;
@@ -633,7 +635,7 @@ function genMass() {
     const rt = renta(baseMensual, e.hijos, e.cony) * (dias / 30), net = br - ob - rt - (e.pres || 0);
     return `<tr id="row-${e.ced}"><td><strong>${e.nom}</strong><br><small>${e.mail || 'Sin correo'}</small></td><td>${fmt(br)}</td><td>${fmt(net)}</td><td class="st">Pendiente</td></tr>`;
   }).join('');
-  
+
   document.getElementById('bol-m-res').style.display = 'block';
   toast('Generadas ' + filtered.length + ' boletas');
 }
@@ -643,7 +645,7 @@ async function sendMass() {
   const filtered = emps.filter(e => e.tp === tipo && e.mail);
   const smtp = JSON.parse(localStorage.getItem('cg_smtp') || '{}');
   if (!smtp.host) { toast('Configure el SMTP primero', 'err'); return; }
-  
+
   const des = document.getElementById('bol-m-des').value, has = document.getElementById('bol-m-has').value;
   const dias = parseInt(document.getElementById('bol-m-dias').value) || 15;
 
@@ -652,10 +654,10 @@ async function sendMass() {
     const row = document.getElementById('row-' + e.ced);
     if (!row) continue;
     row.querySelector('.st').innerHTML = '<i class="ti ti-loader animate-spin"></i> Enviando...';
-    
+
     const hex = hexs.filter(h => h.emp === e.ced && h.est === 'aprobado' && h.fec >= des && h.fec <= has).reduce((s, h) => s + parseFloat(h.h || 0), 0);
     const html = getBolHTML(e, des, has, hex, 0, dias);
-    
+
     try {
       const r = await fetch('http://localhost:3001/api/mail/send-boleta', {
         method: 'POST',
@@ -733,8 +735,100 @@ function exportCCSS() {
 }
 */
 
+function initMarcas() {
+  const hoy = new Date();
+  document.getElementById('f-mar-mes').value = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
+  renderMarcas();
+}
+
+function renderMarcas() {
+  const fEmp = document.getElementById('f-mar-emp').value;
+  const fMes = document.getElementById('f-mar-mes').value;
+
+  const filtered = marcas.filter(m => {
+    const matchEmp = !fEmp || m.emp === fEmp;
+    const matchMes = !fMes || m.fec.startsWith(fMes);
+    return matchEmp && matchMes;
+  }).sort((a, b) => b.fec.localeCompare(a.fec));
+
+  const tb = document.getElementById('tb-marcas');
+  if (!tb) return;
+  tb.innerHTML = filtered.map(m => {
+    const e = emps.find(x => x.ced === m.emp) || { nom: 'Desconocido' };
+    return `<tr>
+      <td><strong>${e.nom}</strong></td>
+      <td>${m.fec}</td>
+      <td>${m.ent}</td>
+      <td>${m.sal}</td>
+      <td style="text-align:center;">${m.hNormal}h</td>
+      <td style="text-align:center; color:var(--accent); font-weight:600;">${m.hExtra > 0 ? m.hExtra + 'h' : '-'}</td>
+      <td>
+        <button class="btn-i red" onclick="delMarca('${m.id}')"><i class="ti ti-trash"></i></button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function saveMarca() {
+  const emp = document.getElementById('mar-emp').value;
+  const fec = document.getElementById('mar-fec').value;
+  const ent = document.getElementById('mar-ent').value;
+  const sal = document.getElementById('mar-sal').value;
+
+  if (!emp || !fec || !ent || !sal) { toast('Complete todos los campos', 'err'); return; }
+
+  const diff = (new Date(fec + ' ' + sal) - new Date(fec + ' ' + ent)) / (1000 * 60 * 60);
+  const hNormal = Math.min(8, diff).toFixed(2);
+  const hExtra = Math.max(0, diff - 8).toFixed(2);
+
+  const nueva = { id: Date.now().toString(), emp, fec, ent, sal, hNormal, hExtra };
+  marcas.push(nueva);
+  sv();
+  closeM('m-marca-manual');
+  renderMarcas();
+  toast('Marca registrada correctamente');
+}
+
+function delMarca(id) {
+  if (!confirm('¿Eliminar esta marca?')) return;
+  marcas = marcas.filter(m => m.id !== id);
+  sv();
+  renderMarcas();
+  toast('Marca eliminada');
+}
+
+function importMarcas(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const text = e.target.result;
+    const lines = text.split('\n');
+    let count = 0;
+
+    lines.forEach((line, i) => {
+      if (i === 0 || !line.trim()) return;
+      const [ced, fec, ent, sal] = line.split(',').map(s => s.trim());
+      if (ced && fec && ent && sal) {
+        const diff = (new Date(fec + ' ' + sal) - new Date(fec + ' ' + ent)) / (1000 * 60 * 60);
+        const hNormal = Math.min(8, diff).toFixed(2);
+        const hExtra = Math.max(0, diff - 8).toFixed(2);
+        marcas.push({ id: Date.now().toString() + i, emp: ced, fec, ent, sal, hNormal, hExtra });
+        count++;
+      }
+    });
+
+    sv();
+    renderMarcas();
+    toast(`Se importaron ${count} marcas exitosamente`);
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
 function init() {
-  renderEmps(emps); renderHex(); renderVacs(); renderAus(); renderIncs(); updDash(); initP(); /* initCC(); */ syncSels();
+  renderEmps(emps); renderHex(); renderVacs(); renderAus(); renderIncs(); renderMarcas(); updDash(); initP(); /* initCC(); */ syncSels();
   if (!emps.length) {
     [{ ced: '1-0123-4567', nom: 'Carlos Rodríguez Mora', sal: 450000, pue: 'Oficial de Seguridad', dep: 'Operaciones', tp: 'quincenal', jor: 'nocturna', ing: '2023-01-15', mail: 'c.rodriguez@ciarguesa.com', ase: '123456789' },
     { ced: '2-0456-7890', nom: 'María González Vargas', sal: 680000, pue: 'Supervisora de Turno', dep: 'Supervisión', tp: 'quincenal', jor: 'diurna', ing: '2021-06-01', mail: 'm.gonzalez@ciarguesa.com', ase: '987654321' },

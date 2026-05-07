@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 // Endpoint para probar la conexión SMTP
 router.post('/test', async (req, res) => {
   const { host, port, user, pass, secure } = req.body;
-  
+
   if (!host || !port || !user || !pass) {
     return res.status(400).json({ success: false, message: 'Faltan parámetros de configuración' });
   }
